@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impostazioni</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    #navigazione {
+      display: flex;
+      justify-content: center; /* centrati */
+      gap: 20px; /* spazio tra i bottoni */
+      margin-top: 20px;
+    }
+    #conferma {
+      display: flex;
+      justify-content: center; /* centrati */
+      gap: 20px; /* spazio tra i bottoni */
+      margin-top: 20px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+      button:hover {
+        background-color: #45a049;
+      }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+    <h1>Impostazioni</h1>
+    <form>
+      <div class="form-group" id="campoParola" hidden>
+        <label for="Parola">Parola d'ordine</label>
+        <input type="text" id="Parola" name="Parola"
+               pattern="[A-Za-z]+"
+               title="Inserisci solo lettere dell'alfabeto (senza spazi o accenti)"
+               oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase()" required>
+      </div>
+      <div class="form-group" id="campocategorie">
+        <label for="categorie">Numero di categorie per round</label>
+        <input type="text" id="categorie" name="categorie"
+               inputmode="numeric" pattern="[0-9]+"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+      </div>
+
+      <div class="form-group" id="campoturni">
+        <label for="turni">Numero di turni</label>
+        <input type="text" id="turni" name="turni"
+               inputmode="numeric" pattern="[0-9]+"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+      </div>
+
+      <div class="form-group" id="campotempo">
+        <label for="tempo">Tempo in secondi</label>
+        <input type="text" id="tempo" name="tempo"
+               inputmode="numeric" pattern="[0-9]+"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+      </div>
+      <div class="form-group" id="campolettere">
+        <label for="lettere">Lettere da escludere</label>
+        <input type="text" id="lettere" name="lettere"
+               pattern="[A-Za-z]+"
+               title="Inserisci solo lettere dell'alfabeto (senza spazi o accenti)"
+               oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase()">
+      </div>
+      <div class="form-group" id="timerContainer" hidden>
+        <label></label>
+        <div id="timerDisplay" style="font-size:20px; font-weight:bold;">00:00</div>
+      </div>
+      <div class="form-group" id="campocategoriarichiesta" hidden>
+        <label></label>
+        <div id="categoriarichiesta" style="font-size:20px; font-weight:bold;"></div>
+      </div>
+      <div class="form-group" id="campoparolainserita" hidden>
+        <label for="Parolainserita">Inserisci Parola o frase</label>
+        <input type="text" id="Parolainserita" name="Parolainserita"
+               pattern="[A-Za-zÀ-ÖØ-öø-ÿ ]+"
+               title="Inserisci solo lettere dell'alfabeto, lettere accentate e spazi"
+               oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ ]/g,'').toUpperCase()">
+      </div>
+
+      <button id="bottoneAvanti" type="button">Avanti</button>
+      <button id="bottoneInizia" hidden type="button">Inizia</button>
+
+      <div id="navigazione">
+
+        <button id="Precedente" hidden type="button">Precedente</button>
+        <button id="Prossima" hidden type="button">Successiva</button>
+      </div>
+      <div id="conferma">
+
+        <button id="No" hidden type="button">No</button>
+        <button id="Si" hidden type="button">Si</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>
+<script>
+   
+// ==========================
+// VARIABILI GLOBALI
+// ==========================
+
+let categorie = 0;
+let turni = 0;
+let tempo = 0;
+let lettereInput = "";
+let alfabetoFiltrato = [];
+let seed = 0;
+  let punteggio = 0;
+let risposte = [];
+let categoriaattiva = 1;
+let domandeEstratte = [];
+let lettereEstratte = [];
+let timerInterval = null;
+  let roundattivo = 0;
+const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+  let domande = ["Canzoni brutte di cantanti belli", "Canzoni belle di cantanti brutti", "Aggettivi che puoi associare alla risata del roscio", "Parole che potrebbe inventare Faustini", "Pokemon forti ma brutti", "Pokemon scarsi ma belli", "Personaggi famosi neri", "Personaggi famosi morti ma che erano vivi quando sei nato", "Personaggi famosi vivi ma che non erano ancora nati quando sei nato", "Personaggi famosi che non dovrebbero esserlo"
+    , "Cose che sembrano inutili ma che hanno un' anima", "Professioni che esistono solo nei sogni del martedì", "Oggetti convinti di essere qualcos'altro", "Pesieri che arrivano solo sotto la doccia", "Drammi minuscoli ma vissuti intensamente", "Idee geniali avute troppo tardi", "Idee orribili che per qualche motivo sono diventate realtà",
+    "Rumori che evocano ricordi inventati", "Decisioni prese per puro aesthetic", "Tradizioni di famiglia immaginarie", "Regole non scritte che tutti ignorano", "Regole che non esistono che vorresti tutti rispettassero", "Regole che nessuno segue", "Momenti in cui il tempo fa finta di niente", "Cose che migliorano inspiegabilmente di notte",
+    "Emozioni difficili da spiegare ma facilissime da provare", "soluzioni eccessive a problemi minuscoli", "Soluzioni insignificanti a problemi immensi", "Segreti che nessuno ha mai chiesto di sapere", "Regali brutti natalizi", "Cose che fai che non facevi 10 anni fa", "Cose che non facevi 10 anni fa ma che fai adesso", "Pokemon che imparano aeroassalto", "Città o luoghi che terminano con la tua iniziale", "Frasi presenti in canzoni di Battisti",
+    "Titolo di una canzone da cantare in ambienti malavitosi", "Cose che invidi a Napoli", "Città più belle di Napoli", "Cose che mancano a Napoli", "Un colore che potrebbe non essere presente nella lista dei 1000 colori di Napul è mill color di Pino Daniele", "Parole italiane che tradotte in inglese suonano meglio",
+    "Frutta di stagione della stagione in corso", "Paesi in cui in questo momento è estate", "Animali che sarebbero ottimi spiriti guida", "Sportivi che sono stati campioni del mondo", "Discipline che non esistono ma in cui se esistessero saresti campione del mondo", "Francesi simpatici", "Nomi di quadri che non esistono", "Titolo del prossimo film di Checco Zalone",
+    "Colore abbastanza simile alla maglietta che indossi","Nome di una categoria che starebbe bene in questo gioco", "Nome che daresti a un' app di incontri", "Nome di un incantesimo che potrebbe stare in un Harry Potter blasfemo"
+  ];
+  
+const btnAvanti = document.getElementById("bottoneAvanti");
+const btnInizia = document.getElementById("bottoneInizia");
+const btnProssima = document.getElementById("Prossima");
+const btnPrecedente = document.getElementById("Precedente");
+
+  const Si= document.getElementById("Si");
+  const No = document.getElementById("No");
+
+const categoriarichiesta = document.getElementById("categoriarichiesta");
+const parolainserita = document.getElementById("Parolainserita");
+
+// ==========================
+// PRNG
+// ==========================
+
+function mulberry32(seed) {
+    return function () {
+      let t = seed += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+function estraiDomande(domande, n, seed) {
+    const rng = mulberry32(seed);
+    const copia = [...domande];
+    for (let i = copia.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia.slice(0, n);
+}
+
+function estraiLettere(alfabeto, n, seed) {
+    const rng = mulberry32(seed);
+    const copia = [...alfabeto];
+    for (let i = copia.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia.slice(0, n);
+}
+
+function generatoreseed(parola) {
+  let hash = 0;
+  for (let i = 0; i < parola.length; i++) {
+    hash = Math.imul(31, hash) + parola.charCodeAt(i) | 0;
+  }
+  return hash >>> 0;
+}
+  function temposcaduto() {
+    risposte[categoriaattiva - 1] = parolainserita.value;
+    categoriaattiva = 1
+    categoriarichiesta.textContent = domandeEstratte[0];
+    parolainserita.value = risposte[0];
+    parolainserita.readOnly = true;
+   
+    document.querySelector("h1").textContent =
+      ` REVISIONE ROUND ${roundattivo}`;
+    btnProssima.hidden = true;
+    btnPrecedente.hidden = true;
+    Si.hidden = false;
+    No.hidden=false
+  }
+// ==========================
+// CLICK AVANTI
+// ==========================
+
+btnAvanti.addEventListener("click", function () {
+
+    categorie = parseInt(document.getElementById("categorie").value);
+    turni = parseInt(document.getElementById("turni").value);
+    tempo = parseInt(document.getElementById("tempo").value);
+    lettereInput = document.getElementById("lettere").value.toUpperCase();
+  alfabetoFiltrato = alfabeto.filter(l => !lettereInput.includes(l));
+    if (!categorie || !turni || !tempo) {
+      alert("Inserisci tutti i valori numerici richiesti!");
+      return;
+  }
+  if (turni > alfabetoFiltrato.length) {
+    alert("Secondo le impostazioni selezionate il numero di turni non può essere maggiore di "+ alfabetoFiltrato.length);
+    return;
+  }
+  if ((turni*categorie) > domande.length) {
+    alert("Ci sono troppe poche domande a sistema. Abbassare il numero di turni o di categorie. (Il prodotto non deve superare il numero di domande totali a sitema  che al momento è" + domande.length +")");
+    return;
+  }
+    
+
+    document.getElementById("campoParola").hidden = false;
+    document.getElementById("campocategorie").hidden = true;
+    document.getElementById("campoturni").hidden = true;
+    document.getElementById("campotempo").hidden = true;
+    document.getElementById("campolettere").hidden = true;
+
+    btnAvanti.hidden = true;
+  btnInizia.hidden = false;
+    btnInizia.textContent="Inizia Round 1"
+});
+
+// ==========================
+// CLICK INIZIA
+// ==========================
+
+  btnInizia.addEventListener("click", function () {
+   
+    
+    if (roundattivo < turni) {
+      roundattivo = roundattivo + 1;
+      const parola = document.getElementById("Parola").value.toUpperCase();
+      if (!parola) {
+        alert("Inserisci la parola d'ordine!");
+        return;
+      }
+
+      seed = generatoreseed(parola);
+      
+      domandeEstratte = estraiDomande(domande, categorie, (seed + roundattivo));
+       domande = domande.filter(
+        d => !domandeEstratte.includes(d)
+      );
+      lettereEstratte = estraiLettere(alfabetoFiltrato, turni, seed);
+
+      risposte = Array.from({ length: categorie }, () => "");
+      categoriaattiva = 1;
+
+      categoriarichiesta.textContent = domandeEstratte[0];
+      document.getElementById("campocategoriarichiesta").hidden = false;
+
+      document.querySelector("h1").textContent =
+        `ROUND ${roundattivo}: LETTERA ${lettereEstratte[roundattivo-1]}`;
+
+      document.getElementById("campoparolainserita").hidden = false;
+      document.getElementById("campoParola").hidden = true;
+
+      btnInizia.hidden = true;
+      btnProssima.hidden = categorie <= 1;
+      btnPrecedente.hidden = true;
+
+      parolainserita.value = "";
+       parolainserita.readOnly = false;
+      startTimer();
+    }else
+    {
+      if (roundattivo == turni) {
+        document.getElementById("campoparolainserita").hidden = true;
+        document.getElementById("campocategoriarichiesta").hidden = true;
+        btnInizia.textContent = "Inizia un'altra partita";
+        document.querySelector("h1").textContent = "Il tuo punteggio è: " + punteggio;
+        timerDisplay.hidden = true;
+        roundattivo = 10000;
+      } else {
+        location.reload();
+      }
+    }
+});
+
+// ==========================
+// TIMER
+// ==========================
+
+function startTimer() {
+
+    if (timerInterval) clearInterval(timerInterval);
+
+    let remaining = tempo;
+    const timerContainer = document.getElementById("timerContainer");
+    const timerDisplay = document.getElementById("timerDisplay");
+
+    timerContainer.hidden = false;
+    timerDisplay.textContent = remaining + "s";
+
+    timerInterval = setInterval(() => {
+      remaining--;
+      timerDisplay.textContent = remaining + "s";
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        temposcaduto();
+      }
+    }, 1000);
+}
+
+// ==========================
+// PROSSIMA
+// ==========================
+
+btnProssima.addEventListener("click", function () {
+
+    risposte[categoriaattiva - 1] = parolainserita.value;
+
+    categoriaattiva++;
+
+    parolainserita.value = risposte[categoriaattiva - 1] || "";
+    categoriarichiesta.textContent = domandeEstratte[categoriaattiva - 1];
+
+    btnProssima.hidden = categoriaattiva >= categorie;
+    btnPrecedente.hidden = categoriaattiva <= 1;
+});
+
+// ==========================
+// PRECEDENTE
+// ==========================
+
+btnPrecedente.addEventListener("click", function () {
+
+    risposte[categoriaattiva - 1] = parolainserita.value;
+
+    categoriaattiva--;
+
+    parolainserita.value = risposte[categoriaattiva - 1] || "";
+    categoriarichiesta.textContent = domandeEstratte[categoriaattiva - 1];
+
+    btnProssima.hidden = categoriaattiva >= categorie;
+    btnPrecedente.hidden = categoriaattiva <= 1;
+});
+
+  Si.addEventListener("click", function () {
+    punteggio = punteggio + 1;
+    categoriaattiva = categoriaattiva + 1;
+    categoriarichiesta.textContent = domandeEstratte[categoriaattiva - 1];
+    if (categoriaattiva < (categorie + 1)) {
+      parolainserita.value = risposte[categoriaattiva - 1];
+    }
+    if (categoriaattiva > categorie) {
+      Si.hidden = true;
+      No.hidden = true;
+      btnInizia.hidden = false;
+      if (roundattivo < (turni)) {
+        roundattivo = roundattivo + 1;
+        btnInizia.textContent = "Inizia Round " + roundattivo;
+        roundattivo = roundattivo - 1;
+      } else {
+        btnInizia.textContent = "Mostra punteggio";
+      }
+    }
+  });
+  No.addEventListener("click", function () {
+    categoriaattiva = categoriaattiva + 1;
+    categoriarichiesta.textContent = domandeEstratte[categoriaattiva - 1];
+    parolainserita.value = risposte[categoriaattiva - 1];
+    if (categoriaattiva == categorie) {
+      Si.hidden = true;
+      No.hidden = true;
+      btnInizia.hidden = false;
+      roundattivo = roundattivo + 1;
+      btnInizia.textContent = "Inizia Round " + roundattivo;
+      roundattivo = roundattivo - 1;
+    }
+  });
+
+</script>
