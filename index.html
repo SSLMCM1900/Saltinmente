@@ -418,17 +418,23 @@ btnPrecedente.addEventListener("click", function () {
     }
   });
   No.addEventListener("click", function () {
+   
     categoriaattiva = categoriaattiva + 1;
     categoriarichiesta.textContent = domandeEstratte[categoriaattiva - 1];
-    parolainserita.value = risposte[categoriaattiva - 1];
-    if (categoriaattiva == categorie) {
+    if (categoriaattiva < (categorie + 1)) {
+      parolainserita.value = risposte[categoriaattiva - 1];
+    }
+    if (categoriaattiva > categorie) {
       Si.hidden = true;
       No.hidden = true;
       btnInizia.hidden = false;
-      roundattivo = roundattivo + 1;
-      btnInizia.textContent = "Inizia Round " + roundattivo;
-      roundattivo = roundattivo - 1;
+      if (roundattivo < (turni)) {
+        roundattivo = roundattivo + 1;
+        btnInizia.textContent = "Inizia Round " + roundattivo;
+        roundattivo = roundattivo - 1;
+      } else {
+        btnInizia.textContent = "Mostra punteggio";
+      }
     }
   });
-
 </script>
