@@ -170,9 +170,15 @@ const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
     "Emozioni difficili da spiegare ma facilissime da provare", "soluzioni eccessive a problemi minuscoli", "Soluzioni insignificanti a problemi immensi", "Segreti che nessuno ha mai chiesto di sapere", "Regali brutti natalizi", "Cose che fai che non facevi 10 anni fa", "Cose che non facevi 10 anni fa ma che fai adesso", "Pokemon che imparano aeroassalto", "Città o luoghi che terminano con la tua iniziale", "Frasi presenti in canzoni di Battisti",
     "Titolo di una canzone da cantare in ambienti malavitosi", "Cose che invidi a Napoli", "Città più belle di Napoli", "Cose che mancano a Napoli", "Un colore che potrebbe non essere presente nella lista dei 1000 colori di Napul è mill color di Pino Daniele", "Parole italiane che tradotte in inglese suonano meglio",
     "Frutta di stagione della stagione in corso", "Paesi in cui in questo momento è estate", "Animali che sarebbero ottimi spiriti guida", "Sportivi che sono stati campioni del mondo", "Discipline che non esistono ma in cui se esistessero saresti campione del mondo", "Francesi simpatici", "Nomi di quadri che non esistono", "Titolo del prossimo film di Checco Zalone",
-    "Colore abbastanza simile alla maglietta che indossi","Nome di una categoria che starebbe bene in questo gioco", "Nome che daresti a un' app di incontri", "Nome di un incantesimo che potrebbe stare in un Harry Potter blasfemo"
+    "Colore abbastanza simile alla maglietta che indossi", "Nome di una categoria che starebbe bene in questo gioco", "Nome che daresti a un' app di incontri", "Nome di un incantesimo che potrebbe stare in un Harry Potter blasfemo", "Nome che daresti a un nuovo pokemon di tipo acqua", "Nome che daresti a un nuovo pokemon di tipo spettro", "Programma TV che utilizzerai nella frase :'Ai miei tempi in tv si vedeva ... non la monnezza che vedete oggi' rivolgendoti ai tuoi nipotini",
+    "Sogno proibito che non dovrebbe essere proibito", "Ingrediente che si sposa bene con i carciofi", "Cibo più buono da crudo che da cotto", "Cibo più buono freddo che caldo", "Oggetto che se non esistesse il mondo forse sarebbe migliore", "parole sdrucciole", "Parole che togliendo, aggiungendo o modificando una lettera hanno altro significato (non valgono plurali o modifiche di genere)", "Parole con 12 o più lettere", "Cose più piccole di una mosca", "Cose più grandi di una mongolfiera", "Cose improbabili che succedono incredibilmente spesso nei film",
+    "Cose tipiche del nord Italia", "Cose tipiche del sud Italia", "Cose successe in un anno bisestile", "Via che metteresti in Monopoly se fosse ambientato nel X municipio", "Nomi di luoghi o città che hanno al loro interno un' altra parola di senso compiuto (almeno di tre lettere)", "Nome proprio presente solo una volta nella tua rubrica", "Nome proprio di almeno due contatti della tua rubrica", "Cose meno probabili di vincere al superenalotto (che è 1/622614630)", "Complotti di cui hai sentito parlare"
+    , "Cose che iniziano per caso e finiscono per nostalgia", "Buoni propositi da primo dicembre", "Conversazioni immaginarie che vinciamo sempre", "Oggetti che se potessero parlare sarebbe meglio non parlassero ", "Oggetti che vorresti parlassero", "Abitudini nate per sopravvivere a un lunedì qualsiasi",
+    "Idee che potrebbero essere rivoluzionarie, o quantomeno vincenti", "Materie universitarie esistenti", "Materie universitarie inventate", "Cose che possiede che costano più di 50 euro", "Cose che valgono molto meno di quanto costano", "cose che fai solo quando nessuno ti guarda", "Complimenti che sembrano insulti", "Insulti che sembrano complimenti", "Paure irrazionali ma comprensibili", "Cose che iniziano con entusiasmo e finiscono con 'eh vabbè'", "Suoni paurosi", "Messaggi che non dovresti inviare dopo la mezzanotte",
+    "Cose che migliorano con il tempo", "Scuse creative per non uscire", "Tradimenti culinari accettabili", "Frasi che precedono sempre un disastro", "Lavoro che diresti se dovessi nascondere che in realtà sei un agente federale", "problemi che risolveresti con molti soldi", "Problemi che non si risolvono neanche con un milione di euro", "Teorie oersonali senza base scientifiche", "Parole che contengono un numero scritto in lettere", "città o luoghi con una doppia", "Città o luoghi di 7 lettere", "Frutti con almeno due vocali diverse", "Parole con più vocali che consonanti", "parole con più consonanti che vocali"
+   , "Colori composti da almeno 2 parole","Parole che contengono almeno 4 vocali diverse"
   ];
-  
+  domande=domande.map(str => str.charAt(0).toUpperCase() + str.slice(1));
 const btnAvanti = document.getElementById("bottoneAvanti");
 const btnInizia = document.getElementById("bottoneInizia");
 const btnProssima = document.getElementById("Prossima");
@@ -205,7 +211,7 @@ function estraiDomande(domande, n, seed) {
       [copia[i], copia[j]] = [copia[j], copia[i]];
     }
     return copia.slice(0, n);
-}
+} 
 
 function estraiLettere(alfabeto, n, seed) {
     const rng = mulberry32(seed);
@@ -258,7 +264,7 @@ btnAvanti.addEventListener("click", function () {
     return;
   }
   if ((turni*categorie) > domande.length) {
-    alert("Ci sono troppe poche domande a sistema. Abbassare il numero di turni o di categorie. (Il prodotto non deve superare il numero di domande totali a sitema  che al momento è" + domande.length +")");
+    alert("Ci sono troppe poche domande a sistema. Abbassare il numero di turni o di categorie. (Il prodotto non deve superare il numero di domande totali a sitema  che al momento è " + domande.length +")");
     return;
   }
     
